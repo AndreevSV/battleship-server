@@ -1,19 +1,15 @@
 import 'dotenv/config';
-import { WebSocketServer } from 'ws';
+import { initDb } from './db/initDb.js';
+// import { createWebSocketServer } from './ws/wsServer.js';
 
-const port = Number(process.env.PORT) || 8080;
+try {
+    const { createWebSocketServer } = await import('./ws/wsServer.js');
+    const port = Number(process.env.PORT) || 3000;
 
-const wss = new WebSocketServer({ port });
-console.log(`Websockets started on port: ws://localhost:${port}`);
+    initDb();
 
-wss.on('connection', function connection(ws) {
-    console.log('New client connected');
-    ws.on('error', console.error);
-
-    ws.on('message', function message(data) {
-        console.log('received: %s', data);
-    });
-
-    ws.send('You are on a WebSocket server');
-
-});
+    createWebSocketServer(port);
+} catch (error) {
+    console.error(error);
+    process.exit(1);
+}
